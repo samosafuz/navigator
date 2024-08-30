@@ -209,18 +209,17 @@
         <script src="{$jsbase}/init.js" type="text/javascript" charset="utf-8"></script>
         <script src="{$jsbase}/titledate.js" type="text/javascript" charset="utf-8"></script>
         <xsl:if test="$analytics='yes'">
-          <script type="text/javascript">
-          
-            var _gaq = _gaq || [];
-            _gaq.push(['_setAccount', 'UA-19774706-1']);
-            _gaq.push(['_trackPageview']);
-          
+          <script>
+            var _paq = window._paq = window._paq || [];
+            _paq.push(['trackPageView']);
+            _paq.push(['enableLinkTracking']);
             (function() {
-              var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-              ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-              var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+              var u="//analytics.lib.duke.edu/";
+              _paq.push(['setTrackerUrl', u+'matomo.php']);
+              _paq.push(['setSiteId', '34']);
+              var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+              g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
             })();
-          
           </script>
         </xsl:if>
       </head>
@@ -810,7 +809,7 @@
     <xsl:apply-templates select="$result" mode="app-flatten"/>
   </xsl:template>
   
-  <xsl:template match="t:hi|t:g|t:lb[@break='no']|t:add|t:del|t:subst" mode="app-flatten">🐯<xsl:value-of select="local-name(.)"/>🐯<xsl:for-each select="@*"><xsl:value-of select="name(.)"/>="<xsl:value-of select="."/>"🐯</xsl:for-each><xsl:apply-templates mode="app-flatten"/>🐹<xsl:value-of select="local-name(.)"/>🐹</xsl:template>
+  <xsl:template match="t:hi|t:g|t:lb[@break='no']|t:add|t:del|t:subst" mode="app-flatten">🐯<xsl:value-of select="local-name(.)"/>🐯<xsl:for-each select="@*"><xsl:value-of select="name(.)"/>="<xsl:value-of select="translate(.,',.','🦋🐌')"/>"🐯</xsl:for-each><xsl:apply-templates mode="app-flatten"/>🐹<xsl:value-of select="local-name(.)"/>🐹</xsl:template>
   
   <xsl:template match="text()" mode="app-tokenize">
     <xsl:analyze-string select="." regex="([ \n\r\t,.;;··])+">
@@ -824,8 +823,9 @@
   </xsl:template>
   
   <xsl:template match="text()" mode="app-restore">
+    <xsl:variable name="restore" select="translate(.,'🦋🐌',',.')"/>
     <xsl:variable name="pass1">
-      <xsl:analyze-string select="." regex="🐯([^🐯]+)🐯(([^🐯]+=&quot;[^&quot;]+&quot;🐯)*)([^🐯]*)">
+      <xsl:analyze-string select="$restore" regex="🐯([^🐯]+)🐯(([^🐯]+=&quot;[^&quot;]+&quot;🐯)*)([^🐯]*)">
         <xsl:matching-substring>
           <xsl:element namespace="http://www.tei-c.org/ns/1.0" name="{regex-group(1)}">
             <xsl:attribute name="x">open</xsl:attribute>
